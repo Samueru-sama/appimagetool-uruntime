@@ -74,6 +74,7 @@ static gboolean verbose = FALSE;
 static gboolean showVersionOnly = FALSE;
 static gboolean sign = FALSE;
 static gboolean no_appstream = FALSE;
+static gboolean uruntimepreload = FALSE;
 gchar **remaining_args = NULL;
 gchar *updateinformation = NULL;
 static gboolean guess_update_information = FALSE;
