@@ -526,6 +526,7 @@ static GOptionEntry entries[] =
     { "exclude-file", 0, 0, G_OPTION_ARG_STRING, &exclude_file, _exclude_file_desc, NULL },
     { "runtime-file", 0, 0, G_OPTION_ARG_STRING, &runtime_file, "Runtime file to use", NULL },
     { "sign-key", 0, 0, G_OPTION_ARG_STRING, &sign_key, "Key ID to use for gpg[2] signatures", NULL},
+    { "uruntime-preload", 0, 0, G_OPTION_ARG_NONE, &uruntimepreload, "Set the target AppImage to always reuse the same mountpoint", NULL },
     { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &remaining_args, NULL, NULL },
     { 0,0,0,0,0,0,0 }
 };
@@ -573,6 +574,12 @@ main (int argc, char *argv[])
             if (*owner_start == '/')
                 owner_start++;
             github_repository_name = owner_start;
+        }
+    }
+
+    if (uruntimepreload) {
+        if (putenv("URUNTIME_PRELOAD=1") != 0) {
+            fprintf(stderr, "Failed to preload uruntime\n");
         }
     }
 
