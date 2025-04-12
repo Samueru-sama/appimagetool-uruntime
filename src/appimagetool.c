@@ -649,13 +649,8 @@ main (int argc, char *argv[])
         }
     }
 #endif
-    if(! g_find_program_in_path ("desktop-file-validate"))
-        die("desktop-file-validate command is missing, please install it");
     if(! g_find_program_in_path ("zsyncmake"))
         g_print("WARNING: zsyncmake command is missing, please install it if you want to use binary delta updates\n");
-    if(! no_appstream)
-        if(! g_find_program_in_path ("appstreamcli"))
-            g_print("WARNING: appstreamcli command is missing, please install it if you want to use AppStream metadata\n");
     if(! g_find_program_in_path ("gpg2") && ! g_find_program_in_path ("gpg"))
         g_print("WARNING: gpg2 or gpg command is missing, please install it if you want to create digital signatures\n");
     if(! g_find_program_in_path ("sha256sum") && ! g_find_program_in_path ("shasum"))
@@ -837,7 +832,6 @@ main (int argc, char *argv[])
             gchar *icon_name_with_png = g_strconcat(icon_name, ".png", NULL);
             gchar *example_path = g_build_filename(source, "/", icon_name_with_png, NULL);
             fprintf (stderr, "%s\n", example_path);
-            exit(1);
         }
        
         /* Check if .DirIcon is present in source AppDir */
@@ -846,12 +840,6 @@ main (int argc, char *argv[])
         if (! g_file_test(diricon_path, G_FILE_TEST_EXISTS)){
             fprintf (stderr, "Deleting pre-existing .DirIcon\n");
             g_unlink(diricon_path);
-        }
-        if (! g_file_test(diricon_path, G_FILE_TEST_IS_REGULAR)){
-            fprintf (stderr, "Creating .DirIcon symlink based on information from desktop file\n");
-            int res = symlink(basename(icon_file_path), diricon_path);
-            if(res)
-                die("Could not symlink .DirIcon");
         }
         
         /* Check if AppStream upstream metadata is present in source AppDir */
