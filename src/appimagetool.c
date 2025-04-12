@@ -720,10 +720,6 @@ main (int argc, char *argv[])
 
         /* Read information from .desktop file */
         GKeyFile *kf = g_key_file_new ();
-        if (!g_key_file_load_from_file (kf, desktop_file, G_KEY_FILE_KEEP_TRANSLATIONS | G_KEY_FILE_KEEP_COMMENTS, NULL))
-            die(".desktop file cannot be parsed");
-        if (!get_desktop_entry(kf, "Categories"))
-            die(".desktop file is missing a Categories= key");
         
         if(verbose){
             fprintf (stderr,"Name: %s\n", get_desktop_entry(kf, "Name"));
