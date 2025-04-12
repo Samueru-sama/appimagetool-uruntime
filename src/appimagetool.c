@@ -728,31 +728,7 @@ main (int argc, char *argv[])
             replacestr(destination, " ", "_");
         }
 
-
         fprintf (stdout, "%s should be packaged as %s\n", source, destination);
-        /* Check if the Icon file is how it is expected */
-        gchar* icon_name = get_desktop_entry(kf, "Icon");
-        gchar* icon_file_path = NULL;
-        gchar* icon_file_png;
-        gchar* icon_file_svg;
-        gchar* icon_file_xpm;
-        icon_file_png = g_strdup_printf("%s/%s.png", source, icon_name);
-        icon_file_svg = g_strdup_printf("%s/%s.svg", source, icon_name);
-        icon_file_xpm = g_strdup_printf("%s/%s.xpm", source, icon_name);
-        if (g_file_test(icon_file_png, G_FILE_TEST_IS_REGULAR)) {
-            icon_file_path = icon_file_png;
-        } else if(g_file_test(icon_file_svg, G_FILE_TEST_IS_REGULAR)) {
-            icon_file_path = icon_file_svg;
-        } else if(g_file_test(icon_file_xpm, G_FILE_TEST_IS_REGULAR)) {
-            icon_file_path = icon_file_xpm;
-        } else {
-            fprintf (stderr, "%s{.png,.svg,.xpm} defined in desktop file but not found\n", icon_name);
-            fprintf (stderr, "For example, you could put a 256x256 pixel png into\n");
-            gchar *icon_name_with_png = g_strconcat(icon_name, ".png", NULL);
-            gchar *example_path = g_build_filename(source, "/", icon_name_with_png, NULL);
-            fprintf (stderr, "%s\n", example_path);
-        }
-       
         
         /* Upstream mksquashfs can currently not start writing at an offset,
         * so we need a patched one. https://github.com/plougher/squashfs-tools/pull/13
