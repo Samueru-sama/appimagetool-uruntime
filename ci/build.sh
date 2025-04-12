@@ -36,7 +36,7 @@ make install DESTDIR=AppDir
 
 find AppDir
 
-cp "$(which desktop-file-validate)" AppDir/usr/bin
+#cp "$(which desktop-file-validate)" AppDir/usr/bin
 cp "$(which mksquashfs)" AppDir/usr/bin
 cp "$(which zsyncmake)" AppDir/usr/bin
 
