@@ -447,14 +447,6 @@ gchar* find_first_matching_file_nonrecursive(const gchar *real_path, const gchar
     return NULL;
 }
 
-gchar* get_desktop_entry(GKeyFile *kf, char *key) {
-    gchar *value = g_key_file_get_string (kf, "Desktop Entry", key, NULL);
-    if (! value){
-        fprintf(stderr, "%s entry not found in desktop file\n", key);
-    }
-    return value;
-}
-
 bool readFile(char* filename, size_t* size, char** buffer) {
     FILE* f = fopen(filename, "rb");
     if (f==NULL) {
