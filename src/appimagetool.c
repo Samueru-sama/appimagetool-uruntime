@@ -704,23 +704,6 @@ main (int argc, char *argv[])
         char *destination;
         char source[PATH_MAX];
         realpath(remaining_args[0], source);
-        
-        /* Check if *.desktop file is present in source AppDir */
-        gchar *desktop_file = find_first_matching_file_nonrecursive(source, "*.desktop");
-        if(verbose)
-            fprintf (stdout, "Desktop file: %s\n", desktop_file);
-
-        /* Read information from .desktop file */
-        GKeyFile *kf = g_key_file_new ();
-        
-        if(verbose){
-            fprintf (stderr,"Name: %s\n", get_desktop_entry(kf, "Name"));
-            fprintf (stderr,"Icon: %s\n", get_desktop_entry(kf, "Icon"));
-            fprintf (stderr,"Exec: %s\n", get_desktop_entry(kf, "Exec"));
-            fprintf (stderr,"Comment: %s\n", get_desktop_entry(kf, "Comment"));
-            fprintf (stderr,"Type: %s\n", get_desktop_entry(kf, "Type"));
-            fprintf (stderr,"Categories: %s\n", get_desktop_entry(kf, "Categories"));
-        }
 
         /* Determine the architecture */
         bool archs[4] = {0, 0, 0, 0};
