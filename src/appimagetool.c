@@ -225,30 +225,6 @@ int sfs_mksquashfs(char *source, char *destination, int offset) {
     return 0;
 }
 
-/* Validate desktop file using desktop-file-validate on the $PATH
-* execlp(), execvp(), and execvpe() search on the $PATH */
-int validate_desktop_file(char *file) {
-    int statval;
-    int child_pid;
-    child_pid = fork();
-    if(child_pid == -1)
-    {
-        printf("could not fork! \n");
-        return 1;
-    }
-    else if(child_pid == 0)
-    {
-        execlp("desktop-file-validate", "desktop-file-validate", file, NULL);
-    }
-    else
-    {
-        waitpid(child_pid, &statval, WUNTRACED | WCONTINUED);
-        if(WIFEXITED(statval)){
-            return(WEXITSTATUS(statval));
-        }
-    }
-    return -1;
-}
 
 /* Generate a squashfs filesystem
 * The following would work if we link to mksquashfs.o after we renamed 
@@ -760,15 +736,6 @@ main (int argc, char *argv[])
             replacestr(destination, " ", "_");
         }
 
-        // if $VERSION is specified, we embed its value into the desktop file
-        if (version_env != NULL) {
-            g_key_file_set_string(kf, G_KEY_FILE_DESKTOP_GROUP, "X-AppImage-Version", version_env);
-
-            if (!g_key_file_save_to_file(kf, desktop_file, NULL)) {
-                fprintf(stderr, "Could not save modified desktop file\n");
-                exit(1);
-            }
-        }
 
         fprintf (stdout, "%s should be packaged as %s\n", source, destination);
         /* Check if the Icon file is how it is expected */
@@ -794,58 +761,6 @@ main (int argc, char *argv[])
             fprintf (stderr, "%s\n", example_path);
         }
        
-        /* Check if .DirIcon is present in source AppDir */
-        gchar *diricon_path = g_build_filename(source, ".DirIcon", NULL);
-        
-        if (! g_file_test(diricon_path, G_FILE_TEST_EXISTS)){
-            fprintf (stderr, "Deleting pre-existing .DirIcon\n");
-            g_unlink(diricon_path);
-        }
-        
-        /* Check if AppStream upstream metadata is present in source AppDir */
-        if(! no_appstream){
-            char application_id[PATH_MAX];
-            sprintf (application_id,  "%s", basename(desktop_file));
-            replacestr(application_id, ".desktop", ".appdata.xml");
-            gchar *appdata_path = g_build_filename(source, "/usr/share/metainfo/", application_id, NULL);
-            if (! g_file_test(appdata_path, G_FILE_TEST_IS_REGULAR)){
-                fprintf (stderr, "WARNING: AppStream upstream metadata is missing, please consider creating it\n");
-                fprintf (stderr, "         in usr/share/metainfo/%s\n", application_id);
-                fprintf (stderr, "         Please see https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html#sect-Quickstart-DesktopApps\n");
-                fprintf (stderr, "         for more information or use the generator at\n");
-                fprintf (stderr, "         https://docs.appimage.org/packaging-guide/optional/appstream.html#using-the-appstream-generator\n");
-            } else {
-                fprintf (stderr, "AppStream upstream metadata found in usr/share/metainfo/%s\n", application_id);
-                /* Use ximion's appstreamcli to make sure that desktop file and appdata match together */
-                if(g_find_program_in_path ("appstreamcli")) {
-                    char *args[] = {
-                        "appstreamcli",
-                        "validate-tree",
-                        source,
-                        NULL
-                    };
-                    g_print("Trying to validate AppStream information with the appstreamcli tool\n");
-                    g_print("In case of issues, please refer to https://github.com/ximion/appstream\n");
-                    int ret = run_external(g_find_program_in_path ("appstreamcli"), args);
-                    if (ret != 0)
-                        die("Failed to validate AppStream information with appstreamcli");
-                }
-                /* It seems that hughsie's appstream-util does additional validations */
-                if(g_find_program_in_path ("appstream-util")) {
-                    char *args[] = {
-                        "appstream-util",
-                        "validate-relax",
-                        appdata_path,
-                        NULL
-                    };
-                    g_print("Trying to validate AppStream information with the appstream-util tool\n");
-                    g_print("In case of issues, please refer to https://github.com/hughsie/appstream-glib\n");
-                    int ret = run_external(g_find_program_in_path ("appstream-util"), args);
-                    if (ret != 0)
-                        die("Failed to validate AppStream information with appstream-util");
-                }
-            }
-        }
         
         /* Upstream mksquashfs can currently not start writing at an offset,
         * so we need a patched one. https://github.com/plougher/squashfs-tools/pull/13
