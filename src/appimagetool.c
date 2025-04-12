@@ -715,19 +715,8 @@ main (int argc, char *argv[])
         
         /* Check if *.desktop file is present in source AppDir */
         gchar *desktop_file = find_first_matching_file_nonrecursive(source, "*.desktop");
-        if(desktop_file == NULL){
-            die("Desktop file not found, aborting");
-        }
         if(verbose)
             fprintf (stdout, "Desktop file: %s\n", desktop_file);
-
-        if(g_find_program_in_path ("desktop-file-validate")) {
-            if(validate_desktop_file(desktop_file) != 0){
-                fprintf(stderr, "ERROR: Desktop file contains errors. Please fix them. Please see\n");
-                fprintf(stderr, "       https://standards.freedesktop.org/desktop-entry-spec/1.0/n");
-                die("       for more information.");
-            }
-        }
 
         /* Read information from .desktop file */
         GKeyFile *kf = g_key_file_new ();
